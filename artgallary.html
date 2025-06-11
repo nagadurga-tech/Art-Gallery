@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Art Gallery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <style>
+        body{
+            background-color: #f8f9fa;
+        }
+        .card img{
+            height:200px;
+            object-fit:cover;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <span  id="nav" class="navbar-brand mb=0 h1"><b>My Art Gallary</b></span>
+        </div>
+    </nav>
+    <div class="container">
+        <form id="artForm" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <input type="text" id="title" class="form-control" placeholder="Artwork Title" required>
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="description" class="form-control" placeholder="Description" required>
+            </div>
+            <div class="col-md-4">
+                <input type="url" id="image" class="form-control" placeholder="image URL" required>
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary"> Add Artwork</button>
+            </div>
+        </form>
+        <div id="gallery" class="row row-cols-1 row-cols-md-3 g-4"></div>
+    </div>
+    <script>
+        const form=document.getElementById('artForm')
+        const gallery=document.getElementById('gallery')
+        let artworks=JSON.parse(localStorage.getItem('artworks')) ||[];
+
+        function renderGallery(){
+            gallery.innerHTML='';
+            artworks.forEach((art,index)=>{
+                gallery.innerHTML+=`
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <img src="${art.image}" class="card-img-top" alt="${art.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${art.title}</h5>
+                            <p class="card-text">${art.description}</p>
+                            <button class="btn btn-sm btn-warning me-2 onclick="editArt(${index})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteArt(${index})">Delete</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+            function saveToLocal(){
+                localStorage.setItem('artworks',JSON.stringify(artworks));
+            }
+            form.addEventListener('submit',(e)=>{
+                e.preventDefault()
+                const newArt={
+                    title:form.title.value,
+                    description:form.description.value,
+                    image:form.image.value
+                };
+                artworks.push(newArt);
+                saveToLocal()
+                renderGallery()
+                form.reset()
+            });
+
+            function deleteArt(index){
+                artworks.splice(index,1);
+                saveToLocal()
+                renderGallery()
+            }
+
+            function editArt(index){
+                const art=artworks[index];
+                form.title.value=art.title;
+                form.description.value=art.description;
+                form.image.value=art.image;
+                artworks.splice(index,1);
+                saveToLocal()
+                renderGallery()
+            }  
+        renderGallery();
+    </script>
+</body>
+</html>
